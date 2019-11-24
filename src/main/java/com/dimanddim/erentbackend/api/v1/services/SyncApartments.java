@@ -16,7 +16,8 @@ public class SyncApartments {
         "κήπος", "air condition", "air-condition", "ατομική", "γκαράζ", "ισόγεια",
         "ισόγειο", "boiler", "δίχωρη", "δίχωρο", "διαθέσιμο", "πολυκατοικία",
         "τηλέφωνο", "χώρος στάθμευσης", "διαμπερές", "αποθήκη", "κλιματισμό", "μικρό",
-        "μικρή", "συσκευές", "επίπλωσης", "βεράντα", "κουφώματα"
+        "μικρή", "συσκευές", "επίπλωσης", "βεράντα", "κουφώματα", "στούντιο", "ηλεκτρικές",
+        "ευρύχωρο", "ευρύχωρη", "μονοκατοικία", "ηλιακό", "οικιακό", "διαθέτει"
     };
 
     public static List<Apartment> getApartmentsFromHtml(String html) {
@@ -28,7 +29,7 @@ public class SyncApartments {
 
             Apartment apartment = new Apartment();
 
-            apartment.setId(Long.valueOf(text.split("</b>")[0]));
+            apartment.setId(Long.valueOf(text.split("</b>")[0].trim()));
 
             apartment.setDate(text.split("<font size=\"-1\"><b>")[1].split("</b>")[0].trim());
 
@@ -43,7 +44,7 @@ public class SyncApartments {
                 apartment.setType("Διαμέρισμα");
             }
 
-            if(apartmentAsText.split("τ.μ.").length == 2){
+            if(apartmentAsText.split("τ\\.μ\\.").length == 2){
                 if(apartment.getType().equals("Διαμέρισμα")){
                     String sqString = apartmentAsText.split("διαμέρισμα")[1].split("τ.μ.")[0].trim();
                     apartment.setSquareMeters(Integer.valueOf(sqString));
@@ -136,7 +137,12 @@ public class SyncApartments {
                         address += allAddress[i].trim() + ".";
                     }
                 }
-                address = address.substring(0, address.length() - 1);
+                if(address.isEmpty()){
+                    address = allAddress[0];
+                }
+                else{
+                    address = address.substring(0, address.length() - 1);
+                }
                 region = "";
             }
         }
@@ -160,7 +166,12 @@ public class SyncApartments {
                     region += allRegion[i].trim() + ".";
                 }
             }
-            return region.substring(0, region.length() - 1);
+            if(region.isEmpty()){
+                return allRegion[0];
+            }
+            else{
+                return region.substring(0, region.length() - 1);
+            }
         }
         else{
             return "";
