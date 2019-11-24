@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,9 +42,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                //.antMatchers("/api/v1/**").hasRole("ADMIN")
-                //.antMatchers("/api/v1/auth/**").permitAll()
-                .antMatchers("/api/v1/**").permitAll()
+                .antMatchers("/api/v1/sync_apartments").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/apartments").hasRole("USER")
+                .antMatchers("/api/v1/users").permitAll()//hasRole("ADMIN")
+                .antMatchers("/api/v1/auth/**").permitAll()
+                //.antMatchers("/api/v1/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .apply(new JwtConfigurer(jwtTokenProvider));
@@ -53,10 +56,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3001", "https://localhost:3001", "https://family-scouting-admin-frontend.herokuapp.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PATCH"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // configuration.setAllowedOrigins(Arrays.asList();
+        // configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PATCH"));
+        // configuration.setAllowCredentials(true);
+        // configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
