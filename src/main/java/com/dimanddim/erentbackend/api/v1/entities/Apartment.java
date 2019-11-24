@@ -39,6 +39,9 @@ public class Apartment {
     @Column(name = "features")
     private String features;
 
+    @Column(name = "availableFrom")
+    private String availableFrom;
+
     public Apartment() {
 
     }
@@ -135,6 +138,14 @@ public class Apartment {
 
     public void setFeatures(String features) {
         this.features = features;
+    }
+
+    public String getAvailableFrom() {
+        return availableFrom;
+    }
+
+    public void setAvailableFrom(String availableFrom) {
+        this.availableFrom = availableFrom;
     }
     
 }
