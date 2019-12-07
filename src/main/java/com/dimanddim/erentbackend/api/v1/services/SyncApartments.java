@@ -134,10 +134,10 @@ public class SyncApartments {
             else {
                 String[] allAddress = text.split("οδό")[1].split("\\.");
                 address = "";
-                for(int i=0; i<allAddress.length; i++) {
-                    if (containsKeyword(allAddress[i]) == null){
-                        address += allAddress[i].trim() + ".";
-                    }
+                int i=0;
+                while(containsKeyword(allAddress[i]) == null && i<allAddress.length){
+                    address += allAddress[i].trim() + ".";
+                    i++;
                 }
                 if(address.isEmpty()){
                     address = allAddress[0];
@@ -163,10 +163,10 @@ public class SyncApartments {
         if(text.split("περιοχή").length == 2) {
             String[] allRegion = text.split("περιοχή")[1].split("\\.");
             String region = "";
-            for(int i=0; i<allRegion.length; i++) {
-                if(containsKeyword(allRegion[i]) == null){
-                    region += allRegion[i].trim() + ".";
-                }
+            int i=0;
+            while(containsKeyword(allRegion[i]) == null && i<allRegion.length){
+                region += allRegion[i].trim() + ".";
+                i++;
             }
             if(region.isEmpty()){
                 return allRegion[0];
