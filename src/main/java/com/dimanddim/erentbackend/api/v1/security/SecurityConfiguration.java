@@ -1,7 +1,5 @@
 package com.dimanddim.erentbackend.api.v1.security;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,9 +42,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/v1/sync_apartments").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/v1/apartments").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/v1/jwtTokensWhiteLists").denyAll()
                 .antMatchers("/api/v1/users").hasRole("ADMIN")
                 .antMatchers("/api/v1/auth/**").permitAll()
-                //.antMatchers("/api/v1/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .apply(new JwtConfigurer(jwtTokenProvider));

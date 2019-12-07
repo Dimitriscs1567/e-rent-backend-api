@@ -43,6 +43,10 @@ public class SyncApartmentsController {
 
                 int status = con.getResponseCode();
                 if(status == 200){
+                    if(offset == 0){
+                        apartmentRepository.deleteAll();
+                    }
+
                     BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     String inputLine;
                     StringBuffer html = new StringBuffer();
