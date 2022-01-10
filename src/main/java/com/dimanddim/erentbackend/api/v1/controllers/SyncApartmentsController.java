@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,25 +30,25 @@ public class SyncApartmentsController {
     private ApartmentRepository apartmentRepository;
 
     @GetMapping("/sync_apartments")
-    public ResponseEntity syncApartments(){
+    public ResponseEntity syncApartments() {
         Map<Object, Object> response = new HashMap<>();
 
         try {
             boolean end = false;
             int offset = 0;
-            while(!end){
-                
+            while (!end) {
+
                 URL url = new URL("http://enoikiazetai.uoi.gr/show.php?offset=" + offset + "&dd_type=0&sort=0");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
-
                 int status = con.getResponseCode();
-                if(status == 200){
-                    if(offset == 0){
+                if (status == 200) {
+                    if (offset == 0) {
                         apartmentRepository.deleteAll();
                     }
 
-                    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    InputStreamReader isr = new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8);
+                    BufferedReader in = new BufferedReader(isr);
                     String inputLine;
                     StringBuffer html = new StringBuffer();
                     while ((inputLine = in.readLine()) != null) {
@@ -55,18 +56,17 @@ public class SyncApartmentsController {
                     }
                     in.close();
                     con.disconnect();
-                    if(html.toString().contains("Δεν υπάρχουν στοιχεία για αυτήν την αναζήτηση")){
+                    if (html.toString().contains("Δεν υπάρχουν στοιχεία για αυτήν την αναζήτηση")) {
                         end = true;
-                    }
-                    else{
+                    } else {
                         List<Apartment> apartments = SyncApartments.getApartmentsFromHtml(html.toString());
 
-                        for(Apartment apartment : apartments){
+                        for (Apartment apartment : apartments) {
                             apartmentRepository.save(apartment);
                         }
                     }
-                }
-                else{
+                } else {
+                    con.disconnect();
                     response.put("message", "could not connect to uni server.");
                     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
                 }
@@ -82,7 +82,7 @@ public class SyncApartmentsController {
         } catch (IOException e) {
             response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }   
+        }
     }
 
 }

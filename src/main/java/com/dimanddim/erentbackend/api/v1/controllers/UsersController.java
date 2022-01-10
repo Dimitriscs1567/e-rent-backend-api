@@ -16,14 +16,13 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RepositoryRestController
 public class UsersController {
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired 
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @PatchMapping("/users/{id}")
@@ -31,23 +30,23 @@ public class UsersController {
 
         Map<String, String> response = new HashMap<>();
 
-        if(!userRepository.findById(id).isPresent()){
+        if (!userRepository.findById(id).isPresent()) {
             response.put("message", "Unable to find user with id: " + id);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         User user = userRepository.findById(id).get();
 
-        if(data.get("roles") != null){
-            user.setRoles((List<String>)data.get("roles"));
+        if (data.get("roles") != null) {
+            user.setRoles((List<String>) data.get("roles"));
         }
 
-        if(data.get("password") != null && !data.get("password").equals("")){
-            user.setPassword(passwordEncoder.encode((String)data.get("password")));
+        if (data.get("password") != null && !data.get("password").equals("")) {
+            user.setPassword(passwordEncoder.encode((String) data.get("password")));
         }
 
-        if(data.get("email") != null){
-            user.setEmail((String)data.get("email"));
+        if (data.get("email") != null) {
+            user.setEmail((String) data.get("email"));
         }
 
         userRepository.save(user);

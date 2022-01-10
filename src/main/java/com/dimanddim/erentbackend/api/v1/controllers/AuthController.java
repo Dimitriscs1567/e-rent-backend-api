@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/auth")
-public class AuthController{
+public class AuthController {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -39,7 +39,7 @@ public class AuthController{
     @Autowired
     JwtTokensWhiteListRepository tokensWhiteListRepository;
 
-    @Autowired 
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/signin")
@@ -49,22 +49,23 @@ public class AuthController{
         try {
             String email = data.get("email");
             String password = data.get("password");
-            if(email == null || password == null || password.equals("")){
+            if (email == null || password == null || password.equals("")) {
                 response.put("message", "Request must contain an email and a password");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            
-            if(!email.equals("mobile-app")){
+
+            if (!email.equals("mobile-app")) {
                 deleteOtherTokens(email);
             }
-                
-            String token = jwtTokenProvider.createToken(email, this.userRepository.findByEmail(email).get().getRoles(), false);
+
+            String token = jwtTokenProvider.createToken(email, this.userRepository.findByEmail(email).get().getRoles(),
+                    false);
             tokensWhiteListRepository.save(new JwtTokensWhiteList(token));
             response.put("email", email);
             response.put("token", token);
-            
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (AuthenticationException e) {
             response.put("message", "Invalid email/password supplied");
@@ -73,24 +74,24 @@ public class AuthController{
     }
 
     @GetMapping("/signout")
-    public ResponseEntity logout(HttpServletRequest request){
+    public ResponseEntity logout(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);
         Map<Object, Object> model = new HashMap<>();
 
-        if(token != null && jwtTokenProvider.validateToken(token)){
+        if (token != null && jwtTokenProvider.validateToken(token)) {
             tokensWhiteListRepository.deleteById(token);
             model.put("message", "Signout completed.");
-        }
-        else{
+        } else {
             model.put("Error", "Invalid token.");
         }
 
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
-    void deleteOtherTokens(String email){
-        for(var  token : tokensWhiteListRepository.findAll()){
-            if(!jwtTokenProvider.validateToken(token.getToken()) || jwtTokenProvider.getEmail(token.getToken()).equals(email)){
+    void deleteOtherTokens(String email) {
+        for (var token : tokensWhiteListRepository.findAll()) {
+            if (!jwtTokenProvider.validateToken(token.getToken())
+                    || jwtTokenProvider.getEmail(token.getToken()).equals(email)) {
                 tokensWhiteListRepository.delete(token);
             }
         }
